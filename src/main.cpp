@@ -1,13 +1,10 @@
 //
 // Created by 蔣 ‘sssssss on 2024/6/11.
 //
-#include <cstring>
 #include <iostream>
 #include <fstream>
 #include "cyclebreaker.h"
 #include "cyclebreaker.cpp"
-#include "Graph.h"
-#include "Graph.cpp"
 #include <vector>
 #include <ctime>
 
@@ -33,17 +30,23 @@ int main(int argc, char *argv[])
     //////////// read the input file /////////////
 
     char type[200];
-
     fstream fin(argv[1]);
-    fstream fout;
-    fout.open(argv[2], ios::out);
+//    fstream fout;
+//    fout.open(argv[2], ios::out);
     int  VertexNum,EdgeNum;
     fin >> type;
     fin >> VertexNum;
     fin >> EdgeNum;
     cout<<type<<endl;
     int junk, num;
-    Graph G(VertexNum, type);
+    bool d;
+    if(type == "u"){    //unweighted
+        d = false;
+    }
+    else{
+        d = true;    //weighted
+    }
+    Graph G(VertexNum, d);
 
     for (int i = 0; i<EdgeNum;i++){
         int v, w, weight;
@@ -53,9 +56,10 @@ int main(int argc, char *argv[])
     }
 
 
-//    //////////// the breaking part////////////////
-//    maxPlanarSubset maxPlanarSubset;
-//    maxPlanarSubset.initializeMatrix(stoi(buffer),stoi(buffer));
+    //////////// the breaking part////////////////
+
+    G.primMST(argv[2]);
+    return 0;
 //    int number = maxPlanarSubset.maxPlanarSubsett(chord,data,buffer);
 //    cout<< "#num:" << number << " " << endl;
 //    fout << number << '\n';

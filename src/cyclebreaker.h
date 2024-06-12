@@ -23,8 +23,9 @@ public:
     void addEdge(int v, int w, int weight);
     void printGraph() const;
     void kruskalMST() const;
-    void primMST() const;
 
+
+    void primMST(const string &output) const;
 
 private:
     int vertices;

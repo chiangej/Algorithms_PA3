@@ -3,10 +3,10 @@
 //
 
 #include <queue>
+#include <limits>
 #include "cyclebreaker.h"
-using namespace std
+using namespace std;
 
-#include "Graph.h"
 
 // 構造函數
 Graph::Graph(int vertices, bool directed) {
@@ -55,7 +55,8 @@ void Graph::unionSets(std::vector<int>& parent, std::vector<int>& rank, int x, i
     }
 }
 
-void Graph::primMST() const {
+
+void Graph::primMST( const string& output) const {
     // 儲存每個頂點的最小邊權重
     vector<int> key(vertices, numeric_limits<int>::max());
     // 儲存節點是否包含在 MST 中
@@ -88,19 +89,32 @@ void Graph::primMST() const {
         }
 
     }
+    ofstream foutMST(output);
+    foutMST << "以下是被移除的邊及其權重:" << endl;
+    int check = 0;
+    for (int u = 0; u < vertices; ++u) {
+        for (const auto& neighbor : adjList[u]) {
 
-    for (int i = 1; i < vertices; ++i) {
-        mst.push_back({parent[i], i});
-    }
-
-    std::cout << "以下是 Prim 算法計算的 MST:" << std::endl;
-    for (const auto& [u, v] : mst) {
-        for (const auto& [adj, weight] : adjList[u]) {
-            if (adj == v) {
-                std::cout << u << " -- " << v << " == " << weight << std::endl;
-                break;
+            int v = neighbor.first;
+            int weight = neighbor.second;
+            if (u < v) {
+                bool inMST = false;
+                for (int i = 1; i < vertices; ++i) {
+                    if ((parent[i] == u && i == v) || (parent[i] == v && i == u)) {
+                        inMST = true;
+                        break;
+                    }
+                }
+                if (!inMST) {
+                    check = 1;
+                    foutMST << u << " " << v << " " << weight << '\n';
+                }
             }
         }
     }
+    if(check == 0){
+        foutMST<<0<<endl;
+    }
+
 }
 
