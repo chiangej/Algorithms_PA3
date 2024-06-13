@@ -33,7 +33,7 @@ all	: bin/cb
 
 bin/cb	: cb.o main.o
 			$(CC) $(OPTFLAGS) cb.o main.o -o bin/cb
-main.o 	: src/main.cpp src/cyclebreaker.h
+main.o 	: src/main.cpp src/cyclebreaker.cpp
 			$(CC) $(CFLAGS) $< -o $@
 cb.o	: src/cyclebreaker.cpp src/cyclebreaker.h
 			$(CC) $(CFLAGS) $(OPTFLAGS) $< -o $@
