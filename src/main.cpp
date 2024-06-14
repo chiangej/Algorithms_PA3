@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
 
     //////////// read the input file /////////////
 
-    char type[200];
+    string type;
     fstream fin(argv[1]);
 
     int VertexNum, EdgeNum;
@@ -49,9 +49,12 @@ int main(int argc, char *argv[]) {
     }
 
     G.kruskalMST();
-//    if(d){
-//        G.AddEdge();
-//    }
-    G.PrintEdge(argv[2]);
+    if(type.find("d") != string::npos){
+        G.AddEdge();
+        G.PrintEdge2(argv[2]);
+    }else{
+        G.PrintEdge(argv[2]);
+    }
+
     return 0;
 }

@@ -45,9 +45,10 @@ void Graph::unionSets(vector<int>& parent, std::vector<int>& rank, int x, int y)
 bool compareEdgeDescending(const Edge& a, const Edge& b) {
     return a.weight > b.weight;
 }
-void Graph:: deleteEdge(int v, int w) {
-    adjList[v].remove_if([w](const pair<int, int> &edge) {
-        return edge.first == w;
+void Graph::deleteEdge(int src, int dest) {
+    auto& edges = adjList[src];
+    edges.remove_if([dest](const std::pair<int, int>& edge) {
+        return edge.first == dest;
     });
 }
 
@@ -68,7 +69,6 @@ void Graph:: kruskalMST() {
         int y = find(parent, next_edge.dest);
 
         if (x != y) {
-            result.push_back(next_edge);
             unionSets(parent, rank, x, y);
         } else {
             deleteEdge(next_edge.src,next_edge.dest);
@@ -79,44 +79,49 @@ void Graph:: kruskalMST() {
 
 }
 
-void Graph::AddEdge(){
+void Graph::AddEdge() {
     sort(DelelteEdge.begin(), DelelteEdge.end(), compareEdgeDescending);
-    for (auto node : DelelteEdge) {
-        if (node.weight>0){
-            adjList[node.src].emplace_back(node.dest, node.weight);
-            weights -= node.weight;
-            if ( isCyclic()){
-                deleteEdge(node.src,node.dest);
-                weights += node.weight;
+
+    for (auto it = DelelteEdge.begin(); it != DelelteEdge.end();) {
+        if (it->weight > 0) {
+            adjList[it->src].emplace_back(it->dest, it->weight);
+
+            if (isCyclic()) {
+                deleteEdge(it->src, it->dest);
+
+            } else {
+                weights -= it->weight;
+                it = DelelteEdge.erase(it);
             }
+            ++it; // 移动到下一个元素
+        } else {
+            ++it;
         }
     }
 }
 
-bool Graph::DFS(int v, vector<bool>& visited, vector<bool>& Gray) const {
+bool Graph::DFS(int v,vector<Color>& colors) const {
+    colors[v] = Color::GRAY;
 
-    if (!visited[v]) {
-        visited[v] = true;
-        Gray[v] = true;
-
-        for (auto neighbor : adjList[v]) {
-            if (!visited[neighbor.first] && DFS(neighbor.first, visited, Gray)) {
-                return true;
-            } else if (Gray[neighbor.first]) {
-                return true;
-            }
+    for (const auto& neighbor : adjList[v]) {
+        int neighborVertex = neighbor.first;
+        if (colors[neighborVertex] == Color::GRAY) {
+            return true;
+        }
+        if (colors[neighborVertex] == Color::WHITE && DFS(neighborVertex, colors)) {
+            return true;
         }
     }
-    Gray[v] = false;
+
+    colors[v] = Color::BLACK;
     return false;
 }
 
 bool Graph::isCyclic() const {
-    vector<bool> visited(vertices, false);
-    vector<bool> recStack(vertices, false);
+    vector<Color> colors(vertices, Color::WHITE);
 
     for (int i = 0; i < vertices; ++i) {
-        if (DFS(i, visited, recStack)) {
+        if (colors[i] == Color::WHITE && DFS(i, colors)) {
             return true;
         }
     }
@@ -129,11 +134,21 @@ void Graph::PrintEdge(const string &output) {
     fout << weights << '\n';
     fout << isCyclic()<< '\n';
     if(!DelelteEdge.empty()){
-
             for (const auto &edge: DelelteEdge) {
                 fout << edge.src << " " << edge.dest << " " << edge.weight << " " << endl;
             }
 
     }
 
+}
+void Graph::PrintEdge2(const string &output) {
+    ofstream fout(output + "-remainEdge");
+    fout << weights << '\n';
+
+    for (int i = 0; i < vertices; ++i) {
+        fout << "Vertex " << i << ":";
+        for (const auto& neighbor : adjList[i]) {
+            fout << " -> (dest: " << neighbor.first << ", weight: " << neighbor.second << "\n"")";
+        }
+    }
 }

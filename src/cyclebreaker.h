@@ -29,33 +29,32 @@ public:
 
 class Graph {
 public:
+    bool isCyclic() const;
+    int weights = 0;
     Graph(int vertices, bool directed);
     void addEdge(int v, int w, int weight);
     vector<Edge> edges;
-    void printGraph() const;
-    void kruskalMST();
     vector<Edge> DelelteEdge;
+    void kruskalMST();
     vector<string> outputLines;
-    int weights = 0;
     void AddEdge();
     void PrintEdge(const string &output);
+    void PrintEdge2(const string &output);
 
 
 private:
+    enum class Color {
+        WHITE,
+        GRAY,
+        BLACK
+    };
     int vertices;
     bool directed;
     vector<list<pair<int, int>>> adjList;
     int find(vector<int>& parent, int i) const;
     void unionSets(vector<int>& parent, vector<int>& rank, int x, int y) const;
-
-    bool isCyclic() const;
-
-    bool DFS(int v, vector<bool> &visited, vector<bool> &Gray) const;
-
-    void PrintEdge();
-
     void deleteEdge(int v, int w);
-
+    bool DFS(int v, vector<Color> &colors) const;
 
 };
 
