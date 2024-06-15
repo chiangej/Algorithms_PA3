@@ -28,7 +28,7 @@ int Graph::find(vector<int>& parent, int i) const {
     return parent[i];
 }
 
-void Graph::unionSets(vector<int>& parent, std::vector<int>& rank, int x, int y) const {
+void Graph::unionSets(vector<int>& parent, vector<int>& rank, int x, int y) const {
     int xroot = find(parent, x);
     int yroot = find(parent, y);
 
@@ -47,7 +47,13 @@ bool compareEdgeDescending(const Edge& a, const Edge& b) {
 }
 void Graph::deleteEdge(int src, int dest) {
     auto& edges = adjList[src];
-    edges.remove_if([dest](const std::pair<int, int>& edge) {
+    edges.remove_if([dest](const pair<int, int>& edge) {
+        return edge.first == dest;
+    });
+}
+void Graph::deleteEdge2(int src, int dest) {
+    auto& edges = adjList2[src];
+    edges.remove_if([dest](const pair<int, int>& edge) {
         return edge.first == dest;
     });
 }
@@ -76,10 +82,13 @@ void Graph:: kruskalMST() {
             weights = weights + next_edge.weight;
         }
     }
-
+    adjList2 = adjList;
+    weights2 = weights;
+    tempEdge = DelelteEdge;
 }
 
 void Graph::AddEdge() {
+
     sort(DelelteEdge.begin(), DelelteEdge.end(), compareEdgeDescending);
 
     for (auto it = DelelteEdge.begin(); it != DelelteEdge.end();) {
@@ -88,16 +97,77 @@ void Graph::AddEdge() {
 
             if (isCyclic()) {
                 deleteEdge(it->src, it->dest);
+                ++it;
 
             } else {
                 weights -= it->weight;
                 it = DelelteEdge.erase(it);
             }
-            ++it; // 移动到下一个元素
+
         } else {
             ++it;
         }
     }
+}
+void Graph::AddEdge2() {
+
+    sort(tempEdge.begin(), tempEdge.end(), [](const Edge& a, const Edge& b) {
+        if (a.weight == b.weight) {
+            if (a.src == b.src) {
+                return a.dest > b.dest;
+            }
+            return a.src < b.src;
+        }
+        return a.weight > b.weight;
+    });
+
+    for (auto it = tempEdge.begin(); it != tempEdge.end();) {
+        if (it->weight > 0) {
+            adjList2[it->src].emplace_back(it->dest, it->weight);
+
+            if (isCyclic2()) {
+                deleteEdge2(it->src, it->dest);
+                ++it;
+
+            } else {
+                weights2 -= it->weight;
+                it = tempEdge.erase(it);
+            }
+
+        } else {
+            ++it;
+        }
+    }
+    if (weights2 < weights){
+        DelelteEdge = tempEdge;
+        weights = weights2;
+    }
+}
+bool Graph::DFS2(int v,vector<Color>& colors) const {
+    colors[v] = Color::GRAY;
+
+    for (const auto& neighbor : adjList2[v]) {
+        int neighborVertex = neighbor.first;
+        if (colors[neighborVertex] == Color::GRAY) {
+            return true;
+        }
+        if (colors[neighborVertex] == Color::WHITE && DFS2(neighborVertex, colors)) {
+            return true;
+        }
+    }
+    colors[v] = Color::BLACK;
+    return false;
+}
+
+bool Graph::isCyclic2() const {
+    vector<Color> colors(vertices, Color::WHITE);
+
+    for (int i = 0; i < vertices; ++i) {
+        if (colors[i] == Color::WHITE && DFS2(i, colors) ) {
+            return true;
+        }
+    }
+    return false;
 }
 
 bool Graph::DFS(int v,vector<Color>& colors) const {
@@ -112,7 +182,6 @@ bool Graph::DFS(int v,vector<Color>& colors) const {
             return true;
         }
     }
-
     colors[v] = Color::BLACK;
     return false;
 }
@@ -121,7 +190,7 @@ bool Graph::isCyclic() const {
     vector<Color> colors(vertices, Color::WHITE);
 
     for (int i = 0; i < vertices; ++i) {
-        if (colors[i] == Color::WHITE && DFS(i, colors)) {
+        if (colors[i] == Color::WHITE && DFS(i, colors) ) {
             return true;
         }
     }
@@ -130,25 +199,12 @@ bool Graph::isCyclic() const {
 
 
 void Graph::PrintEdge(const string &output) {
-    ofstream fout(output + "k2");
+    ofstream fout(output);
     fout << weights << '\n';
-    fout << isCyclic()<< '\n';
     if(!DelelteEdge.empty()){
             for (const auto &edge: DelelteEdge) {
                 fout << edge.src << " " << edge.dest << " " << edge.weight << " " << endl;
             }
+    };
 
-    }
-
-}
-void Graph::PrintEdge2(const string &output) {
-    ofstream fout(output + "-remainEdge");
-    fout << weights << '\n';
-
-    for (int i = 0; i < vertices; ++i) {
-        fout << "Vertex " << i << ":";
-        for (const auto& neighbor : adjList[i]) {
-            fout << " -> (dest: " << neighbor.first << ", weight: " << neighbor.second << "\n"")";
-        }
-    }
 }

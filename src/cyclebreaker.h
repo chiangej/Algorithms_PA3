@@ -30,15 +30,20 @@ public:
 class Graph {
 public:
     bool isCyclic() const;
+    bool isCyclic2() const;
     int weights = 0;
+    int weights2 ;
     Graph(int vertices, bool directed);
     void addEdge(int v, int w, int weight);
     vector<Edge> edges;
     vector<Edge> DelelteEdge;
+    vector<Edge> tempEdge;
+    vector<Edge> DelelteEdge2;
     void kruskalMST();
     vector<string> outputLines;
     void AddEdge();
     void PrintEdge(const string &output);
+    void AddEdge2();
     void PrintEdge2(const string &output);
 
 
@@ -51,11 +56,15 @@ private:
     int vertices;
     bool directed;
     vector<list<pair<int, int>>> adjList;
+    vector<list<pair<int, int>>> adjList2;
     int find(vector<int>& parent, int i) const;
     void unionSets(vector<int>& parent, vector<int>& rank, int x, int y) const;
     void deleteEdge(int v, int w);
     bool DFS(int v, vector<Color> &colors) const;
+    bool DFS2(int v, vector<Color> &colors) const;
 
+
+    void deleteEdge2(int src, int dest);
 };
 
 

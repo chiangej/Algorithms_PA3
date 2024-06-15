@@ -51,7 +51,8 @@ int main(int argc, char *argv[]) {
     G.kruskalMST();
     if(type.find("d") != string::npos){
         G.AddEdge();
-        G.PrintEdge2(argv[2]);
+        G.AddEdge2();
+        G.PrintEdge(argv[2]);
     }else{
         G.PrintEdge(argv[2]);
     }
